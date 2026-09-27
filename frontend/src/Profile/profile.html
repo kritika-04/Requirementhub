@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Page Heading */
+    h1 {
+      font-size: 52px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 25px;
+      letter-spacing: -1px;
+    }
+
+    /* User Profile Header */
+    .profile-info {
+      text-align: center;
+      margin-bottom: 45px;
+      font-size: 18px;
+    }
+
+    .profile-info .welcome {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .profile-info .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .profile-info i {
+      font-size: 20px;
+    }
+
+    /* Pending Developer Request Section */
+    .developer-card {
+      text-align: left;
+      margin-bottom: 30px;
+      line-height: 1.5;
+      font-size: 18px;
+    }
+
+    .developer-card p {
+      margin-bottom: 4px;
+    }
+
+    /* Default Button Styles matching the screenshot */
+    button {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      background-color: #efefef;
+      color: #000000;
+      border: 1px solid #767676;
+      border-radius: 2px;
+      padding: 3px 8px;
+      cursor: pointer;
+    }
+
+    button:active {
+      background-color: #e5e5e5;
+    }
+
+    .approve-btn {
+      margin-top: 4px;
+      padding: 2px 8px;
+    }
+
+    /* Input & AI Analysis Section */
+    .analysis-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 25px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 90px;
+      padding: 8px;
+      font-family: monospace, Arial, sans-serif;
+      font-size: 14px;
+      border: 1px solid #767676;
+      border-radius: 2px;
+      resize: vertical;
+    }
+
+    textarea::placeholder {
+      color: #555555;
+    }
+
+    .analyze-btn {
+      width: 100%;
+      padding: 4px 0;
+      text-align: center;
+    }
+
+    /* Logout Section */
+    .logout-section {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .logout-btn {
+      padding: 3px 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <h1>Profile</h1>
+
+    <!-- Manager Info Section -->
+    <div class="profile-info">
+      <p class="welcome">Welcome, manager1!</p>
+      <div class="info-row">
+        <i class="fa-solid fa-user"></i>
+        <span>MANAGER</span>
+      </div>
+      <div class="info-row">
+        <i class="fa-solid fa-envelope"></i>
+        <span>manager1@example.com</span>
+      </div>
+      <div class="info-row">
+        <i class="fa-solid fa-building-user"></i>
+        <span>ABC Software Solutions</span>
+      </div>
+    </div>
+
+    <!-- Developer Item Section -->
+    <div class="developer-card">
+      <p>1. developer1</p>
+      <p>Email- developer1@example.com</p>
+      <p>Role- DEVELOPER</p>
+      <p>Status- pending</p>
+      <button class="approve-btn">Approve</button>
+    </div>
+
+    <!-- AI Analysis Section -->
+    <div class="analysis-section">
+      <textarea placeholder="Paste raw transcript text, Slack messages, or client emails..."></textarea>
+      <button class="analyze-btn">Analyze with AI</button>
+    </div>
+
+    <!-- Logout Section -->
+    <div class="logout-section">
+      <button class="logout-btn">Logout</button>
+    </div>
+  </div>
+
+</body>
+</html>

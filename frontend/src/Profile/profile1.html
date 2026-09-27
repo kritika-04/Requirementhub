@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #ffffff;
+      color: #111827;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Page Heading */
+    h1 {
+      font-size: 52px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 25px;
+      letter-spacing: -1px;
+    }
+
+    /* User Profile Header */
+    .profile-info {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+
+    .profile-info .welcome {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .profile-info .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #374151;
+    }
+
+    .profile-info i {
+      font-size: 18px;
+      color: #111827;
+    }
+
+    /* Pending Developer Request Section */
+    .developer-card {
+      text-align: left;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      font-size: 17px;
+    }
+
+    .developer-card p {
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    /* Global Modern Button Base Styles */
+    button {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* 1. Approve Button Style */
+    .approve-btn {
+      margin-top: 8px;
+      padding: 8px 18px;
+      background-color: #16a34a; /* Vibrant Green */
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
+    }
+
+    .approve-btn:hover {
+      background-color: #15803d;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3);
+    }
+
+    .approve-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Input & AI Analysis Section */
+    .analysis-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px;
+      font-family: monospace, sans-serif;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    /* 2. Analyze with AI Button Style */
+    .analyze-btn {
+      width: 100%;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); /* AI Gradient */
+      color: #ffffff;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .analyze-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+    }
+
+    .analyze-btn:active {
+      transform: translateY(0);
+    }
+
+    /* 3. Logout Button Style */
+    .logout-section {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .logout-btn {
+      padding: 8px 22px;
+      background-color: #f3f4f6;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+
+    .logout-btn:hover {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <h1>Profile</h1>
+
+    <!-- Manager Info Section -->
+    <div class="profile-info">
+      <p class="welcome">Welcome, manager1!</p>
+      <div class="info-row">
+        <i class="fa-solid fa-user"></i>
+        <span>MANAGER</span>
+      </div>
+      <div class="info-row">
+        <i class="fa-solid fa-envelope"></i>
+        <span>manager1@example.com</span>
+      </div>
+      <div class="info-row">
+        <i class="fa-solid fa-building-user"></i>
+        <span>ABC Software Solutions</span>
+      </div>
+    </div>
+
+    <!-- Developer Item Section -->
+    <div class="developer-card">
+      <p>1. developer1</p>
+      <p>Email- developer1@example.com</p>
+      <p>Role- DEVELOPER</p>
+      <p>Status- pending</p>
+      <button class="approve-btn">
+        <i class="fa-solid fa-check"></i> Approve
+      </button>
+    </div>
+
+    <!-- AI Analysis Section -->
+    <div class="analysis-section">
+      <textarea placeholder="Paste raw transcript text, Slack messages, or client emails..."></textarea>
+      <button class="analyze-btn">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze with AI
+      </button>
+    </div>
+
+    <!-- Logout Section -->
+    <div class="logout-section">
+      <button class="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </div>
+
+</body>
+</html>

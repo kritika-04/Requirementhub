@@ -12,12 +12,14 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 from .reqclassify import ask_mistral
-from .models import User 
+from .models import ProjectPlanning, User , Sprint , ProjectMember
 from .models import Company
 from .models import Project
 from .models import Requirement
 from .models import VersionHistory
+from .models import RequirementSuggestion
 from django.db.models import Max
+from django.contrib.auth.hashers import make_password
 
 import pdfplumber
 import traceback
@@ -29,7 +31,6 @@ def signup(request):
             {"message": "OK"},
             status=200
         )
-
     if request.method != "POST":
         return JsonResponse(
             {
@@ -37,7 +38,6 @@ def signup(request):
             },
             status=405
         )
-
     try:
         data = json.loads(request.body)
         name = data.get("name")
@@ -57,7 +57,6 @@ def signup(request):
             )
         # Check existing email
         if User.objects.filter(email=email).exists():
-
             return JsonResponse(
                 {
                     "message": "Email already registered"
@@ -80,6 +79,7 @@ def signup(request):
             role=role,
             company=companyobj,
         )
+        user.password = make_password(password)
         user.save()
         print("User created successfully:", user)
 
@@ -449,7 +449,10 @@ def getrequirements(request,projectid):
         try:
             reqs=Requirement.objects.filter(project_id=projectid)
             print(reqs)
-            return JsonResponse([{"id":r.id,"requirement":r.requirement,"status":r.status,"priority":r.priority,"type":r.type,"projectid":projectid} for r in reqs],safe=False)
+            return JsonResponse([{"id":r.id,"requirement":r.requirement,"status":r.status,
+                                  "priority":r.priority,"type":r.type,"projectid":projectid,
+                                  "reason":r.reason,"implementation_status":r.implementation_status,
+                                  "sprint_id":r.sprint_id} for r in reqs],safe=False)
         except Exception as e:
             print(e)
 
@@ -490,8 +493,196 @@ def versionhistory(request,reqid):
     except Exception as e:
         return Response({"error": str(e)})
 
+@api_view(['POST'])
+def requirementsuggest(request,reqid):
+    print(request.data)
+    if request.method == 'POST':
+        try:
+            # {'req': {'id': 31, 'requirement': 'Users must be able to register for an account using either email or Google login.', 'status': 'clear', 'priority': 'Critical', 'type': 'Functional', 'projectid': 1, 'comment': 'I have changed priority because it is important'}, 'uid': 6}
+            suggestedby_id=request.data.get('uid')
+            data=request.data.get('req')
+            rs=RequirementSuggestion(project_id=data.get('projectid'),requirement_id=reqid,suggestedrequirement=data.get('requirement'), suggestedtype=data.get('type'),suggestedpriority=data.get('priority'),status='pending',comment = data.get('comment'),suggestedby_id=suggestedby_id)
+            rs.save()
+            print('saved')
+            return JsonResponse({"messsage":"saved successfully"})
+        except Exception as e:
+            return Response({"error": str(e)})
 
+@api_view(['GET'])
+def allrequirementsuggestion(request,reqid):
+    try:
+        rs=list(RequirementSuggestion.objects.filter(requirement_id=reqid).values())
+        return JsonResponse(rs,safe=False)
+    except Exception as e:
+        return Response({"error": str(e)})
 
+@api_view(['POST'])
+def statusrequirementsuggest(request,sid):
+    print(request.data)
+    if request.method == 'POST':
+        try:
+            status=request.data.get('status')
+            rid=request.data.get('rid')
+            Userid=request.data.get('Userid')
+            rs=RequirementSuggestion.objects.get(id=sid)
+            print(rs.suggestedby_id)
+            # rs.status=status
+            # rs.save()
+            if(status=='approve'):
+                r=Requirement.objects.get(id=rid)
+                # r.requirement=rs.suggestedrequirement
+                # r.type=rs.suggestedtype
+                # r.priority=rs.suggestedpriority
+                # r.save()
+                # print(r.suggestedby)
+                latest_version = (VersionHistory.objects.filter(requirement_id=rid).aggregate(Max("version"))["version__max"] or 0)
+                vh = VersionHistory.objects.create(
+                    requirement_id=rid,
+                    project_id=r.project_id,
+                    requirementtext=rs.suggestedrequirement,
+                    type=rs.suggestedtype,
+                    priority=rs.suggestedpriority,
+                    status=r.status,
+                    editedby_id=Userid,
+                    suggestedby_id=rs.suggestedby_id,
+                    version=latest_version+1
+                        )
+                vh.save()
+# {'rid': 31, 'status': 'approve'}
+            return JsonResponse({"messsage":"status saved successfully"})
+        except Exception as e:
+            return Response({"error": str(e)})
 # {'id': 0, 'requirement': 'The system shall support secure multi-factor authentication (MFA) for verified users to ensure authorized access.', 'type': 'Security', 'priority': 'Critical', 'status': 'clear', 'saved': False}
 #{'req': {'id': 2, 'requirement': 'The system shall enable users to upload CSV data files via the main dashboard, with a maximum file size limit of 50 megabytes.', 'type': 'Functional', 'priority': 'Medium', 'status': 'clear', 'saved': False}, 'projectid': '1'}
     
+@api_view(['POST'])
+def projectplanning(request, pid):
+    if request.method=='POST':
+        try:
+            data=request.data
+            pp=ProjectPlanning(project_id=pid,planned_end_date=data.get('planned_end_date'),planned_number_of_sprints=data.get('planned_number_of_sprints'),planned_number_of_team_members=data.get('planned_number_of_team_members'),status='planned',createdby_id=data.get('userid'))
+            pp.save()
+            pm=ProjectMember(project_id=pid,user_id=data.get('userid'))
+            pm.save()
+            print(data,pid)
+            return JsonResponse({"message":"Project planning saved successfully"})
+        except Exception as e:
+            return Response({"error": str(e)})
+#{'planned_end_date': '2026-11-30T17:41', 'planned_number_of_sprints': '4', 'planned_number_of_team_members': '4'}
+
+@api_view(['GET'])
+def getprojectplanning(request,pid):
+    if request.method == 'GET':
+        try:
+            pp=ProjectPlanning.objects.get(project_id=pid)
+            print(pp)
+            return Response({
+            "id": pp.id,
+            "projectid": pp.project_id,
+            "planned_end_date": pp.planned_end_date,
+            "planned_number_of_sprints": pp.planned_number_of_sprints,
+            "planned_number_of_team_members": pp.planned_number_of_team_members,
+        })
+        except Exception as e:
+            return Response({"error": str(e)})
+
+@api_view(['POST'])
+def addsprint(request, pid):
+    print(pid)
+    if request.method=='POST':
+        try:
+            data=request.data
+            s=Sprint(project_id=pid,createdby_id=data.get('userid'),name=data.get('name'),goal=data.get('goal'),start_date=data.get('start_date'),end_date=data.get('end_date'),status='planned')
+            s.save()
+            pp=ProjectPlanning.objects.get(project_id=pid)
+            pp.status='inprogress'
+            pp.save()
+            return JsonResponse({"message":"Sprint added successfully"})
+        except Exception as e:
+            return Response({"error": str(e)})
+
+@api_view(['GET'])
+def getallsprint(request,pid):
+    if request.method=='GET':
+        try:
+            sprints=Sprint.objects.filter(project_id=pid)
+            return JsonResponse([{"id":s.id,"name":s.name,"goal":s.goal,"start_date":s.start_date,"end_date":s.end_date} for s in sprints],safe=False)
+        except Exception as e:
+            return Response({"error": str(e)})
+
+@api_view(['POST'])
+def addrequirement(request,sid):
+    if request.method=='POST':
+        try:
+            data=request.data
+            rid=data.get('requirement_id')
+            r=Requirement.objects.get(id=rid)
+            r.sprint_id=sid
+            r.implementation_status='inprogress'
+            r.save()
+            s=Sprint.objects.get(id=sid)
+            s.status='inprogress'
+            s.save()
+            return JsonResponse({"message":"Requirement added to sprint successfully"})
+        except Exception as e:
+            return Response({"error": str(e)})
+
+@api_view(['GET'])
+def getsprint(request,sid):
+    if request.method=='GET':
+        try:
+            s=Sprint.objects.get(id=sid)
+            return JsonResponse({"id":s.id,"name":s.name,"goal":s.goal,"start_date":s.start_date,"end_date":s.end_date,"status":s.status,"createdby_id":s.createdby_id,"project_id":s.project_id})
+        except Exception as e:
+            return Response({"error": str(e)})
+
+@api_view(['POST'])
+def editsprint(request,sid):
+    if request.method=='POST':
+        try:
+            data=request.data.get('editingSprint')
+            print(f"Data is {data}")
+            s=Sprint.objects.get(id=sid)
+            s.name=data.get('name')
+            s.goal=data.get('goal')
+            s.start_date=data.get('start_date') 
+            s.end_date=data.get('end_date')
+            print(data.get('end_date'))
+            s.save()
+            return JsonResponse({"message":"Sprint updated successfully"})
+        except Exception as e:
+            return Response({"error": str(e)})
+
+@api_view(['GET'])
+def allusers(request,cid):
+    if request.method=='GET':
+        try:
+            users=User.objects.filter(company_id=cid)
+            return JsonResponse([{"id":u.id,"name":u.name,"email":u.email,"role":u.role,"status":u.status} for u in users],safe=False)
+        except Exception as e:
+            return Response({"error": str(e)})
+
+
+@api_view(['POST'])
+def addprojectmember(request,pid):
+    if request.method=='POST':
+        try:
+            data=request.data
+            users=request.data.get('users')
+            print(f"Data is {users}")
+            pms=[ProjectMember(project_id=pid,user_id=u["id"]) for u in users]
+            ProjectMember.objects.bulk_create(pms)
+            return JsonResponse({"message":"Project member added successfully"})
+        # Data is {'users': [{'id': 6, 'name': 'developer1', 'email': 'developer1@example.com', 'role': 'DEVELOPER', 'status': 'approved', 'company': 1}]}
+        except Exception as e:
+            return Response({"error": str(e)})
+
+@api_view(['GET'])
+def allprojectmember(request,pid):
+    if request.method=='GET':
+        try:
+            users=ProjectMember.objects.filter(project_id=pid)
+            nameusers=[{"id":u.user_id,"name":User.objects.get(id=u.user_id).name,"role":User.objects.get(id=u.user_id).role} for u in users]
+            return JsonResponse(nameusers,safe=False)
+        except Exception as e:
+            return Response({"error": str(e)})

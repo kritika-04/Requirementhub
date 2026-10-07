@@ -133,11 +133,14 @@ import Login from "./authentication/component/Login1.jsx";
 import Profile from "./Profile/Profile.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Home from './Home.jsx';
-import Classification from './Classification/Merge.jsx';
+import Classification from './Classification/Merge1.jsx';
 import Project from './project/Project.jsx';
 import Requirement from './project/Requirement/Requirement.jsx'
 import VersionHistory from './project/Requirement/versionhistory.jsx'
-
+import RequirementSuggestion from './project/Requirement/RequirementSuggestion.jsx';
+import AddSprint from './project/Sprint/AddSprint.jsx';
+import Sprint from './project/Sprint/Sprint.jsx';
+import RequirementSource from './project/RequirementSource.jsx';
 // import api from "./axios.js";
 // import Logout from './logout.jsx'
 
@@ -147,7 +150,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/classification" element={<Classification/>}/>
+        <Route path="/:projectid/Requirementsource" element={
+          <ProtectedRoute>
+            <RequirementSource/>
+          </ProtectedRoute>
+          
+          }/>
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={
           <ProtectedRoute>
@@ -155,9 +163,42 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/" element={<Home />} />
-        <Route path="/project/:projectid" element={<Project />} />
+        <Route path="/project/:projectid" element={
+          <ProtectedRoute>
+            <Project />
+          </ProtectedRoute>
+        } />
+        <Route path="/:projectid/requirement" element={
+          <ProtectedRoute>
+            <Requirement />
+          </ProtectedRoute>
+        } />
+        <Route path='/:reqid/versionhistory' element={
+          <ProtectedRoute>
+            <VersionHistory />
+          </ProtectedRoute>
+        } />
+        <Route path='/:reqid/requirementsuggest' element={
+          <ProtectedRoute>
+            <RequirementSuggestion />
+          </ProtectedRoute>
+        } />
+        <Route path="/:projectid/AddSprint" element={
+          <ProtectedRoute>
+            <AddSprint />
+          </ProtectedRoute>
+        } />
+        <Route path=":projectid/:sid/Sprint" element={
+          <ProtectedRoute>
+            <Sprint />
+          </ProtectedRoute>
+        } />
+        {/* <Route path="/project/:projectid" element={<Project />} />
         <Route path="/:projectid/requirement" element={<Requirement />} />
         <Route path='/:reqid/versionhistory' element={<VersionHistory/>}/>
+        <Route path='/:reqid/requirementsuggest' element={<RequirementSuggestion/>}/>
+        <Route path="/:projectid/AddSprint" element={<AddSprint />} />
+        <Route path=":projectid/:sid/Sprint" element={<Sprint />} /> */}
       </Routes>
     </BrowserRouter>
 

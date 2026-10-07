@@ -87,6 +87,9 @@ export default function Projecttabs({ requirementlist,
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [open1, setOpen1] = React.useState(false);
+    const handleOpen1 = () => setOpen1(true);
+    const handleClose1 = () => setOpen1(false);
     const [editingReq, setEditingReq] = useState(null);
     // dividerequirementlist(requirementlist)
     useEffect(()=>{
@@ -113,7 +116,18 @@ export default function Projecttabs({ requirementlist,
         setRequirementlist(updated);
         setOpen(false);
     };
-    
+    const AddRequirementSuggestion = async (rid) => {
+        await api.post(`${rid}/requirementsuggest`,{req:editingReq,uid:Userid})
+        .then((res)=>{
+            console.log(res)
+            alert('suggestion saved successfully')
+        })
+        .catch((err)=>{
+            console.error(err)
+        })
+        // setRequirementlist(updated);
+        setOpen(false);
+    };
     return (<>
     <Navbar/>
         <Box sx={{ width: '100%' }}>
@@ -138,7 +152,13 @@ export default function Projecttabs({ requirementlist,
                                 </Button>
 
                                 <Button variant="contained" color='error' disabled={m.saved}>Delete</Button>
-                                <a href={`/${m.id}/versionhistory`} >versionhistory</a>
+                                <a href={`/${m.id}/versionhistory`} style={{margin:'0 1rem 0 1rem'}}>versionhistory</a>
+                                <Button variant="outlined" disabled={m.saved} onClick={() => {
+                                    setEditingReq({ ...m });   // copy the clicked requirement
+                                    setOpen1(true);
+                                }}>Suggest
+                                </Button>
+                                <a href={`/${m.id}/requirementsuggest`} style={{margin:'0 1rem 0 1rem'}}>view suggestions</a>
                                 {/* <Button variant="contained" color="secondary" disabled={m.saved} onClick={() => { save(m) }}>{m.saved ? "Saved" : "Save"}</Button> */}
                             </div>
                         </div>
@@ -150,25 +170,6 @@ export default function Projecttabs({ requirementlist,
             <Box sx={style}>
                 {editingReq && (
                     <form >
-                        {/* <TextField id='requirement' name='requirement' value={editingReq.requirement} 
-                        // fullWidth={value.toString()}
-                        // rows={5}
-                            onChange={(e) =>
-                                setEditingReq({
-                                    ...editingReq,
-                                    requirement: e.target.value,
-                                })
-                            }
-                            style={{
-                                width: "100%",
-                                padding: "10px",
-                                border: "1px solid #ccc",
-                                borderRadius: "4px",
-                                boxSizing: "border-box",
-                                marginBottom: "16px",
-                                // height:"5px"
-                            }}
-                        ></TextField> */}
                         <TextField
                             label="Requirement"
                             multiline
@@ -233,6 +234,92 @@ export default function Projecttabs({ requirementlist,
                         </FormControl>
                         <Button variant="contained" onClick={updateRequirement}>
                             Update
+                        </Button>
+                    </form>
+                )}
+            </Box>
+        </Modal>
+        <Modal open={open1} onClose={() => setOpen1(false)}>
+            <Box sx={style}>
+                {editingReq && (
+                    <form >
+                        <TextField
+                            label="Requirement"
+                            multiline
+                            rows={4}
+                            fullWidth
+                            value={editingReq.requirement}
+                            onChange={(e) =>
+                                setEditingReq({
+                                    ...editingReq,
+                                    requirement: e.target.value,
+                                })
+                            }
+                        />
+                        <TextField
+                            label="comment"
+                            multiline
+                            rows={4}
+                            fullWidth
+                            // value={''}
+                            onChange={(e) =>
+                                setEditingReq({
+                                    ...editingReq,
+                                    comment: e.target.value,
+                                })
+                            }
+                        />
+                        <FormControl fullWidth>
+                            <InputLabel variant="standard"
+                            >
+                                Priority
+                            </InputLabel>
+                            <NativeSelect
+                                value={editingReq.priority}
+                                inputProps={{
+                                    name: 'priority',
+                                    // id: `${idx}-select`,
+                                }}
+                                onChange={(e) =>
+                                    setEditingReq({
+                                        ...editingReq,
+                                        priority: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value='Critical'>Critical</option>
+                                <option value='High'>High</option>
+                                <option value='Medium'>Medium</option>
+                                <option value='Low'>Low</option>
+                            </NativeSelect>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel variant="standard"
+                            >
+                                Type
+                            </InputLabel>
+                            <NativeSelect
+                                value={editingReq.priority}
+                                inputProps={{
+                                    name: 'type',
+                                    // id: `${idx}-select`,
+                                }}
+                                onChange={(e) =>
+                                    setEditingReq({
+                                        ...editingReq,
+                                        priority: e.target.value,
+                                    })
+                                }
+                            >
+                                <option value='Security'>Security</option>
+                                <option value='Functional'>Functional</option>
+                                <option value='UI/UX'>UI/UX</option>
+                                <option value='Performance'>Performance</option>
+                                <option value='Non-Functional'>Non-Functional</option>
+                            </NativeSelect>
+                        </FormControl>
+                        <Button variant="contained" onClick={()=>AddRequirementSuggestion(editingReq.id)}>
+                            Suggest
                         </Button>
                     </form>
                 )}

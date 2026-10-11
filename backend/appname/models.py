@@ -13,6 +13,7 @@ class User(models.Model):
         MANAGER = 'manager', 'Manager'
         DEVELOPER = 'developer', 'Developer'
         USER = 'user', 'User'
+        STAKEHOLDER='stakeholder' , 'Stakeholder'
     role = models.CharField(max_length=20, choices=Roles.choices, default=Roles.USER)
     class Status(models.TextChoices):
         APPROVED='approved','Approved'

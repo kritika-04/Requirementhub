@@ -1,0 +1,43 @@
+original="Users can log in using their email address and password."
+suggested="Users can log in using their email address, password, and Google authentication."
+ims="notstarted"
+s=None
+{
+  "scope_impact": "no_impact",
+  "reason": "The suggested requirement is explicitly 'None', meaning no change or addition is proposed to the original requirement ('Users can log in using their email address and password'). Since there is no new functionality, clarification, or correction suggested, this does not expand the scope or introduce scope creep. The original requirement remains unchanged.",
+  "implementation_risk": "none",
+  "suggested_action": "normal_review"
+}
+original="The dashboard shall display monthly electricity consumption in kWh."
+suggested="The dashboard shall display monthly electricity consumption in kWh, provide daily and hourly breakdowns, and generate downloadable PDF reports."
+ims="inprogress"
+s="Sprint1"
+result
+{{
+  "scope_impact": "potential_impact",
+  "reason": "The suggested requirement introduces new functionalities not present in the original requirement: daily/hourly breakdowns and downloadable PDF reports. These additions expand the scope beyond the original requirement of displaying monthly electricity consumption.",
+  "implementation_risk": "rework_required",
+  "suggested_action": "manager_review"
+}}
+
+original="The system shall allow users to upload CSV files up to 10 MB."
+suggested="The system shall allow users to upload CSV files with a maximum file size of 10 MB."
+ims="inprogress"
+s="Sprint1"
+{
+  "scope_impact": "potential_impact",
+  "reason": "The suggested change implies a modification to the file size limit from an unspecified upper bound (originally only stating 'up to 10 MB') to a dynamic or configurable limit (implied by the mention of 'Sprint1' and 'inprogress' status, which may suggest a broader discussion around file handling capabilities). While the original requirement does not explicitly mention configurability, the new context hints at potential expansion beyond the original scope (e.g., allowing future adjustments to the 10 MB limit or introducing additional constraints like file type validation, compression support, or batch processing). This could introduce ambiguity or future scope creep if not clearly scoped. The change does not appear to be a mere clarification or correction but rather a potential expansion of functionality.",
+  "implementation_risk": "additional_work",
+  "suggested_action": "manager_review"
+}
+
+o="Users can pay for orders using credit cards."
+s="Users can pay for orders using credit cards, UPI, and digital wallets."
+ims="completed"
+s="Sprint1"
+{
+  "scope_impact": "no_impact",
+  "reason": "The suggested requirement does not introduce new functionality beyond the original requirement ('Users can pay for orders using credit cards'). It appears to be a clarification or refinement of the existing requirement by explicitly assigning it to Sprint 1 and marking it as completed. No additional features or changes to the core functionality are implied. This is a status update rather than a scope expansion.",
+  "implementation_risk": "none",
+  "suggested_action": "normal_review"
+}

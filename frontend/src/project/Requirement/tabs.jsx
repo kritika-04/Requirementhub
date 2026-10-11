@@ -141,6 +141,8 @@ export default function Projecttabs({ requirementlist,
                                     sx={priorityStyles[m.priority]}
                                 />
                                 <Chip label={m.status} color={"primary"} sx={statusStyles[m.status]} />
+                                {m.implementation_status=="inprogress" && <Chip label="Assigned to Sprint" sx={{backgroundColor:'#f7b8ed',color:'#380234'}}></Chip>}
+                                {m.implementation_status=="notstarted" && <Chip label="Not Assigned to Sprint" sx={{backgroundColor:'#f7d7b8',color:'#382502'}}></Chip>}
                                 {m.saved && <Chip label="saved" sx={{ color: 'green', bgcolor: '#ADEBB3' }} />}
                             </div>
                             <p style={{ color: 'black' }}>Requirement: {m.requirement}</p>

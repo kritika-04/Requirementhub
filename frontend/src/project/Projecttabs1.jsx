@@ -68,7 +68,8 @@ const style = {
 };
 
 export default function Projecttabs({ requirementlist,
-    setRequirementlist , projectid }) {
+    setRequirementlist , projectid ,alreadysaved}) {
+    const [disabled, setDisabled] = useState(false);
     const [value, setValue] = React.useState(0);
     const [Username,setUsername]=useState('')
     const [Userid,setUserid]=useState('')
@@ -114,10 +115,10 @@ export default function Projecttabs({ requirementlist,
             console.log(err);
         }
     };
-    const saveAll = async (clist) => {
+    const saveAll = async (clist,statusoflist) => {
         try {
             await api.post("saveallrequirement", {
-                requirements: clist,projectid:projectid,uid:Userid
+                requirements: clist,projectid:projectid,uid:Userid,statusoflist:statusoflist
             });
             alert("All requirements saved successfully");
             const updated = requirementlist.map(r =>
@@ -177,12 +178,14 @@ export default function Projecttabs({ requirementlist,
                     </div>
                 ))
                 }
+                {!alreadysaved && 
                 <Button
                     disabled={clearlist.every(r => r.saved)}
-                    onClick={() => saveAll(clearlist)}
+                    onClick={() => saveAll(clearlist,"clear")}
                 >
                     {clearlist.every(r => r.saved) ? "All Saved" : "Save All"}
                 </Button>
+                }
 
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
@@ -197,26 +200,30 @@ export default function Projecttabs({ requirementlist,
                                 />
                             </div>
                             <p style={{ color: 'black' }}>Requirement: {m.requirement}</p>
-                            <p style={{ color: 'black' }}>Reason: {m.reason}</p>
+                            <p style={{ color: 'grey' }}>Reason: {m.reason}</p>
                             <div>
                                 <Button variant="outlined" disabled={m.saved} onClick={() => {
                                     setEditingReq({ ...m });   // copy the clicked requirement
                                     setOpen(true);
                                 }}>Edit</Button>
                                 {/* <Button variant="contained" color='error' disabled={m.saved}>Delete</Button> */}
+                                {!alreadysaved && 
                                 <Button variant="contained" color="secondary" disabled={m.saved} onClick={() => { save(m) }}>{m.saved ? "Saved" : "Save"}</Button>
+                                }
                             </div>
                         </div>
 
                     </div>
                 ))
                 }
+                {!alreadysaved && 
                  <Button
                     disabled={incompletelist.every(r => r.saved)}
-                    onClick={() => saveAll(incompletelist)}
+                    onClick={() => saveAll(incompletelist,"incomplete")}
                 >
                     {incompletelist.every(r => r.saved) ? "All Saved" : "Save All"}
                 </Button>
+                }
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
                 {duplicatelist && duplicatelist.map((m, idx) => (
@@ -238,12 +245,14 @@ export default function Projecttabs({ requirementlist,
                     </div>
                 ))
                 }
+                {!alreadysaved && 
                  <Button
                     disabled={duplicatelist.every(r => r.saved)}
-                    onClick={() => saveAll(duplicatelist)}
+                    onClick={() => saveAll(duplicatelist,"duplicate")}
                 >
                     {duplicatelist.every(r => r.saved) ? "All Saved" : "Save All"}
                 </Button>
+                }
             </CustomTabPanel>
             <CustomTabPanel value={value} index={3}>
                 {conflictedlist && conflictedlist.map((m, idx) => (
@@ -264,12 +273,14 @@ export default function Projecttabs({ requirementlist,
                     </div>
                 ))
                 }
+                {!alreadysaved && 
                  <Button
                     disabled={conflictedlist.every(r => r.saved)}
-                    onClick={() => saveAll(conflictedlist)}
+                    onClick={() => saveAll(conflictedlist,"conflict")}
                 >
                     {conflictedlist.every(r => r.saved) ? "All Saved" : "Save All"}
                 </Button>
+                }
             </CustomTabPanel>
             
         </Box>
@@ -358,6 +369,15 @@ export default function Projecttabs({ requirementlist,
                                 <option value='Non-Functional'>Non-Functional</option>
                             </NativeSelect>
                         </FormControl>
+                        <Button 
+                            disabled={disabled}
+                            onClick={(e)=>{
+                            setEditingReq({
+                                ...editingReq,
+                                status:"clear"
+                            })
+                            setDisabled(true);
+                        }}>Make it clear</Button>
                         <Button variant="contained" onClick={updateRequirement}>
                             Update
                         </Button>

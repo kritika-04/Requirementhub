@@ -20,10 +20,20 @@ from .models import VersionHistory
 from .models import RequirementSuggestion
 from django.db.models import Max
 from django.contrib.auth.hashers import make_password
-
+from .comparereq import comparereq_mistral
+from .scope_creep import scopecreep_mistral
 import pdfplumber
 import traceback
 import docx
+
+def alreadysavedrequirement(pid):
+    strreq = ""
+    reqs = Requirement.objects.filter(project_id=pid)
+    for r in reqs:
+        if r.status == "clear":
+            strreq += r.requirement + "\n"
+    return strreq
+
 @csrf_exempt
 def signup(request):
     if request.method == "OPTIONS":
@@ -425,22 +435,77 @@ def saverequirement(request):
     return JsonResponse({"message":"Requirement saved successfully"})
 
 @api_view(["POST"])
+# def saveallrequirement(request):
+#     print(request)
+#     print(request.data)
+#     print(request.data.get('requirements'))
+#     req=request.data.get('requirements')
+#     print(request.data.get('projectid'))
+#     projectid=request.data.get('projectid')
+#     uid=request.data.get('uid')
+#     # r=[Requirement(requirement=datar.get('requirement'),status='clear',type=datar.get('type'),priority=datar.get('priority'),project_id=projectid) for datar in req ]
+#     for datar in req:
+#         r=Requirement(requirement=datar.get('requirement'),status='clear',type=datar.get('type'),priority=datar.get('priority'),project_id=projectid)
+#         r.save()
+#         v=VersionHistory(requirement_id=r.id,requirementtext=datar.get('requirement'),status='clear',type=datar.get('type'),priority=datar.get('priority'),project_id=projectid,editedby_id=uid,version=1)
+#         v.save()
+#     # Requirement.objects.bulk_create(r)
+#     return JsonResponse({"message":"All Requirements saved successfully"})
+
 def saveallrequirement(request):
-    print(request)
-    print(request.data)
-    print(request.data.get('requirements'))
-    req=request.data.get('requirements')
-    print(request.data.get('projectid'))
-    projectid=request.data.get('projectid')
-    uid=request.data.get('uid')
-    # r=[Requirement(requirement=datar.get('requirement'),status='clear',type=datar.get('type'),priority=datar.get('priority'),project_id=projectid) for datar in req ]
+    req = request.data.get('requirements', [])
+    projectid = request.data.get('projectid')
+    uid = request.data.get('uid')
+    statusoflist = request.data.get('statusoflist')
+
+    # Fetch requirements already stored in the database
+    existingreq = alreadysavedrequirement(projectid)
+
+    # Recheck requirements only when the submitted list is clear
+    if statusoflist == "clear" and existingreq:
+        ans = comparereq_mistral(existingreq, req)
+
+        # Map comparison results by requirement text
+        result_map = {
+            a.get('requirement'): a
+            for a in ans
+        }
+
+        # Update statuses in the submitted list
+        for datar in req:
+            comparison = result_map.get(datar.get('requirement'))
+
+            if comparison:
+                datar['status'] = comparison.get(
+                    'result',
+                    datar.get('status')
+                )
+
+    # Save every requirement, regardless of its final status
     for datar in req:
-        r=Requirement(requirement=datar.get('requirement'),status='clear',type=datar.get('type'),priority=datar.get('priority'),project_id=projectid)
-        r.save()
-        v=VersionHistory(requirement_id=r.id,requirementtext=datar.get('requirement'),status='clear',type=datar.get('type'),priority=datar.get('priority'),project_id=projectid,editedby_id=uid,version=1)
-        v.save()
-    # Requirement.objects.bulk_create(r)
-    return JsonResponse({"message":"All Requirements saved successfully"})
+        r = Requirement.objects.create(
+            requirement=datar.get('requirement'),
+            status=datar.get('status'),
+            type=datar.get('type'),
+            priority=datar.get('priority'),
+            project_id=projectid
+        )
+
+        VersionHistory.objects.create(
+            requirement_id=r.id,
+            requirementtext=r.requirement,
+            status=r.status,
+            type=r.type,
+            priority=r.priority,
+            project_id=projectid,
+            editedby_id=uid,
+            version=1
+        )
+
+    return JsonResponse({
+        "message": "All requirements saved successfully"
+    })
+
 
 # {'requirements': [{'id': 0, 'requirement': 'The system shall support secure multi-factor authentication (MFA) for verified users to ensure authorized access.', 'type': 'Security', 'priority': 'Critical', 'status': 'clear', 'saved': True}, {'id': 1, 'requirement': 'The system shall allow verified users to log in securely using multi-factor authentication (MFA).', 'type': 'Functional', 'priority': 'High', 'status': 'clear', 'saved': False}, {'id': 2, 'requirement': 'The system shall enable users to upload CSV data files via the main dashboard, with a maximum file size limit of 50 megabytes.', 'type': 'Functional', 'priority': 'Medium', 'status': 'clear', 'saved': False}, {'id': 3, 'requirement': 'The system shall validate and process uploaded CSV files without exceeding the 50MB size limit, rejecting files that violate this constraint.', 'type': 'Performance', 'priority': 'Medium', 'status': 'clear', 'saved': False}, {'id': 4, 'requirement': 'The system shall provide a user-friendly interface in the main dashboard for uploading CSV files, including clear instructions and feedback on upload status.', 'type': 'UI/UX', 'priority': 'Medium', 'status': 'clear', 'saved': False}, {'id': 5, 'requirement': 'The system shall extract individual software requirements from the uploaded CSV data files.', 'type': 'Functional', 'priority': 'High', 'status': 'clear', 'saved': False}, {'id': 6, 'requirement': 'The system shall ensure that the extraction of software requirements from CSV files is accurate and error-free, handling malformed data gracefully.', 'type': 'Non-Functional', 'priority': 'Medium', 'status': 'clear', 'saved': False}, {'id': 7, 'requirement': 'The system shall maintain the integrity and confidentiality of uploaded CSV files during processing and storage, adhering to security best practices.', 'type': 'Security', 'priority': 'High', 'status': 'clear', 'saved': False}, {'id': 8, 'requirement': 'The system shall provide real-time feedback to users regarding the progress and success/failure of CSV file uploads and requirement extraction.', 'type': 'UI/UX', 'priority': 'Medium', 'status': 'clear', 'saved': False}]}
 @api_view(['GET'])
@@ -686,3 +751,108 @@ def allprojectmember(request,pid):
             return JsonResponse(nameusers,safe=False)
         except Exception as e:
             return Response({"error": str(e)})
+
+
+@api_view(['GET'])
+def test_comparision(request):
+#     existingrequirement=alreadysavedrequirement(1)
+#     newrequirement="""The system shall allow verified users to securely log in using multi-factor authentication. 
+# Users can upload CSV data files up to 50 megabytes through the main dashboard. 
+# The application must process these uploaded records and display real-time progress bars. 
+# Administrators can export the final processed reports in PDF or Excel format. 
+# The system must encrypt all stored user data using AES-256 standards. 
+# Response times for page loads must remain under two seconds during peak hours. 
+# The software must automatically log out inactive users after fifteen minutes of idle time.Customers should be able to browse products on the website."""
+#     ans=comparereq_mistral(existingrequirement,newrequirement)
+#     return JsonResponse(ans,safe=False)
+    o="The dashboard displays monthly electricity consumption."
+    s="The dashboard displays monthly consumption, daily/hourly breakdowns, and downloadable PDF reports."
+    ims="inprogress"
+    sp=True
+    ans=scopecreep_mistral(o,s,ims,sp)
+    return JsonResponse(ans,safe=False)
+
+# for a in ans:
+#     if a.result=="clear":
+#         requirements.find((r)=>r.requirement==a.requirement r.status=a.status)
+# [
+#   {
+#     "requirement": "The system shall allow verified users to securely log in using multi-factor authentication.",
+#     "result": "clear",
+#     "related_requirement": "",
+#     "reason": "No existing requirement explicitly mentions multi-factor authentication for login, though email verification is mandatory. This is a new security enhancement."
+#   },
+#   {
+#     "requirement": "Users can upload CSV data files up to 50 megabytes through the main dashboard.",
+#     "result": "clear",
+#     "related_requirement": "",
+#     "reason": "No existing requirement addresses file uploads, data processing, or dashboard functionalities."
+#   },
+#   {
+#     "requirement": "The application must process these uploaded records and display real-time progress bars.",
+#     "result": "clear",
+#     "related_requirement": "",
+#     "reason": "No existing requirement mentions data processing, real-time progress tracking, or upload handling."
+#   },
+#   {
+#     "requirement": "Administrators can export the final processed reports in PDF or Excel format.",
+#     "result": "clear",
+#     "related_requirement": "",
+#     "reason": "No existing requirement addresses report generation or export functionalities."
+#   },
+#   {
+#     "requirement": "The system must encrypt all stored user data using AES-256 standards.",
+#     "result": "clear",
+#     "related_requirement": "",
+#     "reason": "No existing requirement explicitly mentions encryption standards for user data, though security is implied in email verification."
+#   },
+#   {
+#     "requirement": "Response times for page loads must remain under two seconds during peak hours.",
+#     "result": "clear",
+#     "related_requirement": "",
+#     "reason": "No existing requirement specifies performance metrics for page load times."
+#   },
+#   {
+#     "requirement": "The software must automatically log out inactive users after fifteen minutes of idle time.",
+#     "result": "clear",
+#     "related_requirement": "",
+#     "reason": "No existing requirement addresses session timeout or idle user handling."
+#   }
+# ]
+# def requirement_comparision(projectid):
+#     existingrequirement=alreadysavedrequirement(projectid)
+#     newrequirement="""The system shall allow verified users to securely log in using multi-factor authentication. 
+# Users can upload CSV data files up to 50 megabytes through the main dashboard. 
+# The application must process these uploaded records and display real-time progress bars. 
+# Administrators can export the final processed reports in PDF or Excel format. 
+# The system must encrypt all stored user data using AES-256 standards. 
+# Response times for page loads must remain under two seconds during peak hours. 
+# The software must automatically log out inactive users after fifteen minutes of idle time.
+# Customers should be able to browse products on the website."""
+
+#     ans=comparereq_mistral(existingrequirement,newrequirement)
+#     return JsonResponse(ans,safe=False)
+
+# def saveallrequirement(request):
+#     req=request.data.get('requirements')
+#     projectid=request.data.get('projectid')
+#     existingreq=alreadysavedrequirement(projectid)
+#     uid=request.data.get('uid')
+#     statusoflist=request.data.get('statusoflist')
+#     if statusoflist!="clear":
+#         for datar in req:
+#             r=Requirement(requirement=datar.get('requirement'),status=datar.get('status'),type=datar.get('type'),priority=datar.get('priority'),project_id=projectid)
+#             r.save()
+#             v=VersionHistory(requirement_id=r.id,requirementtext=datar.get('requirement'),status=datar.get('status'),type=datar.get('type'),priority=datar.get('priority'),project_id=projectid,editedby_id=uid,version=1)
+#             v.save()
+#     if statusoflist=="clear":
+#         ans=comparereq_mistral(existingreq,req)
+#         for a in ans:
+#             r=req.find((r)=>a.requirement==r.requirement r.status=a.status)
+#     return JsonResponse({"message":"All Requirements saved successfully"})
+
+
+# from django.http import JsonResponse
+# from django.db import transaction
+
+# @transaction.atomic

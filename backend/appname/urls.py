@@ -33,4 +33,5 @@ urlpatterns=[
     path('<int:cid>/alluser',views.alluser,name='alluser'),
     path('<int:pid>/addprojectmember',views.addprojectmember,name='addprojectmember'),
     path('<int:pid>/allprojectmember',views.allprojectmember,name='allprojectmember'),
+    path('test_comparision',views.test_comparision,name='test_comparision'),
 ]

@@ -141,6 +141,7 @@ import RequirementSuggestion from './project/Requirement/RequirementSuggestion.j
 import AddSprint from './project/Sprint/AddSprint.jsx';
 import Sprint from './project/Sprint/Sprint.jsx';
 import RequirementSource from './project/RequirementSource.jsx';
+import { DashboardLayout } from './Dashboard/dashboard.jsx';
 // import api from "./axios.js";
 // import Logout from './logout.jsx'
 
@@ -163,6 +164,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<DashboardLayout />} />
         <Route path="/project/:projectid" element={
           <ProtectedRoute>
             <Project />

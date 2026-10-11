@@ -204,7 +204,7 @@ export default function Merge({projectid}) {
         <Alert severity="info">Note : Requirements are collected from the documents you have uploaded. This is preview , You have to save the requirements</Alert>
         < Projecttabs requirementlist={requirementlist}
             setRequirementlist={setrequirementlist} projectid={projectid}
-             />
+             alreadysaved={false} />
 
         {/* <div>
         

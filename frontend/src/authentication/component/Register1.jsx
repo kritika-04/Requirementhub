@@ -107,7 +107,7 @@ export default function Register() {
                     <h2>Create Account</h2>
                     <p>Start converting unstructured transcripts into software specs</p>
                 </div>
-                {/* FIX 3: Form component handles the submission */}
+                
                 <form component="form" onSubmit={handleSubmit} noValidate
                     sx={{ display: 'flex', flexDirection: 'column', gap: 2, height: '80rem' }}>
 
@@ -157,7 +157,7 @@ export default function Register() {
                         <FormLabel htmlFor="name" ></FormLabel>
                         <TextField
                             id="companycode"
-                            name="companycode" // Important: matches data.get('name')
+                            name="companycode" 
                             placeholder="companycode"
                             required
                             fullWidth
@@ -166,31 +166,20 @@ export default function Register() {
                                     sx: {
                                         '& ::placeholder': {
                                             color: 'black',
-                                            opacity: 1, // Prevents the browser from fading the text
+                                            opacity: 1, 
                                         },
                                     },
                                 },
                             }}
                         />
                     </FormControl>
-                    {/* <FormControl>
-                        <FormLabel id={`role-label`}>Choose you role</FormLabel>
-                        <RadioGroup
-                            aria-labelledby={`role-label`}
-                            defaultValue="female"
-                            name="radio-buttons-group"
-                        >
-                            <FormControlLabel value="Developer" control={<Radio />} label="Developer" />
-                            <FormControlLabel value="Manager" control={<Radio />} label="Manager" />
-                        </RadioGroup>
-                    </FormControl> */}
+                    
                     <div>
                         <input type="radio" id="manager" name="role" value="MANAGER" />
                     <label htmlFor="manager" style={{color: 'black'}}>Manager</label><br />
                     <input type="radio" id="developer" name="role" value="DEVELOPER" />
                     <label htmlFor="developer" style={{color: 'black'}}>Developer</label><br />
                     </div>
-                    
                     <FormControl>
                         <FormLabel htmlFor="email" ></FormLabel>
                         <TextField
@@ -207,7 +196,6 @@ export default function Register() {
                             variant="outlined"
                             color={emailError ? 'error' : 'primary'}
                         />
-
                     </FormControl>
                     <FormControl>
                         <FormLabel htmlFor="password"></FormLabel>
@@ -222,8 +210,6 @@ export default function Register() {
                             fullWidth
                         />
                     </FormControl>
-
-
                     <Button type="submit" fullWidth variant="contained" sx={{ marginTop: '2rem' }}>
                         Sign in
                     </Button>
@@ -238,8 +224,23 @@ export default function Register() {
                             Sign in
                         </Link>
                     </Typography>
+                    
                 </form>
-            </div></div>
+            </div>
+            </div>
             </>
     );
 }
+
+
+{/* <FormControl>
+                        <FormLabel id={`role-label`}>Choose you role</FormLabel>
+                        <RadioGroup
+                            aria-labelledby={`role-label`}
+                            defaultValue="female"
+                            name="radio-buttons-group"
+                        >
+                            <FormControlLabel value="Developer" control={<Radio />} label="Developer" />
+                            <FormControlLabel value="Manager" control={<Radio />} label="Manager" />
+                        </RadioGroup>
+                    </FormControl> */}

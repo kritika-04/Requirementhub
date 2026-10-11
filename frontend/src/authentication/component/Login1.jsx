@@ -126,8 +126,69 @@ export default function Login () {
           <h2>Welcome Back</h2>
           <p>Sign in to access your requirement intelligence workspace</p>
         </div>
+        <form component="form" onSubmit={handleSubmit} noValidate
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2, height: '34rem' }}>
+          <FormControl >
+            <FormLabel htmlFor="email" ></FormLabel>
+            <TextField 
+              error={emailError}
+              helperText={emailErrorMessage}
+              id="email"
+              className="inputfield"
+              type="email"
+              name="email"
+              placeholder="your@email.com"
+              autoComplete="email"
+              autoFocus
+              required
+              fullWidth
+              variant="outlined"
+              color={emailError ? 'error' : 'primary'}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="password" sx={{ margin: '2rem' }}></FormLabel>
+            <TextField
+              error={passwordError}
+              helperText={passwordErrorMessage}
+              placeholder='.....'
+              name="password"
+              type="password"
+              id="password"
+              className="inputfield"
+              required
+              fullWidth
+            />
+          </FormControl>
+          <Button type="submit" fullWidth variant="contained" sx={{ marginTop: '2rem' }}>
+            Sign in
+          </Button>
+          <Divider>or</Divider>
+          <Typography sx={{ textAlign: 'center' , color: 'black'}}>
+            Don&apos;t have an account?{' '}
+            <Link
+              href="http://localhost:5173/register"
+              variant="body2"
+              sx={{ alignSelf: 'center' }}
+            >
+              Sign up
+            </Link>
+          </Typography>
+        </form>
+        <div className="security-tag">
+        </div>
+      </div>
+    </div> 
+    
+  </>);
+};
 
-        {/* {error && <div className="auth-error">{error}</div>}
+{/* <div className="auth-footer">
+          Don't have an account? <Link to="/register">Sign Up</Link>
+        </div> */}
+{/* <ShieldCheck size={14} /> Secured with HTTP-only Cookie JWT */}
+
+{/* {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="input-group">
@@ -165,69 +226,3 @@ export default function Login () {
             <ArrowRight size={16} />
           </button>
         </form> */}
-        <form component="form" onSubmit={handleSubmit} noValidate
-          sx={{ display: 'flex', flexDirection: 'column', gap: 2, height: '34rem' }}>
-
-
-          <FormControl >
-            <FormLabel htmlFor="email" ></FormLabel>
-            <TextField 
-              error={emailError}
-              helperText={emailErrorMessage}
-              id="email"
-              className="inputfield"
-              type="email"
-              name="email"
-              placeholder="your@email.com"
-              autoComplete="email"
-              autoFocus
-              required
-              fullWidth
-              variant="outlined"
-              color={emailError ? 'error' : 'primary'}
-            />
-
-          </FormControl>
-
-          <FormControl>
-            <FormLabel htmlFor="password" sx={{ margin: '2rem' }}></FormLabel>
-            <TextField
-              error={passwordError}
-              helperText={passwordErrorMessage}
-              placeholder='.....'
-              name="password"
-              type="password"
-              id="password"
-              className="inputfield"
-              required
-              fullWidth
-            />
-          </FormControl>
-
-          <Button type="submit" fullWidth variant="contained" sx={{ marginTop: '2rem' }}>
-            Sign in
-          </Button>
-          <Divider>or</Divider>
-          <Typography sx={{ textAlign: 'center' , color: 'black'}}>
-            Don&apos;t have an account?{' '}
-            <Link
-              href="http://localhost:5173/register"
-              variant="body2"
-              sx={{ alignSelf: 'center' }}
-            >
-              Sign up
-            </Link>
-          </Typography>
-        </form>
-
-        {/* <div className="auth-footer">
-          Don't have an account? <Link to="/register">Sign Up</Link>
-        </div> */}
-
-        <div className="security-tag">
-          {/* <ShieldCheck size={14} /> Secured with HTTP-only Cookie JWT */}
-        </div>
-      </div>
-    </div>
-  </>);
-};
